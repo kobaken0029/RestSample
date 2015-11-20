@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">RestSample</string>
+    <string name="result">How is the weather today?</string>
+</resources>
