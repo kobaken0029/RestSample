@@ -1,7 +1,7 @@
 package com.kobaken0029.restsample;
 
-import retrofit.http.GET;
-import retrofit.http.Query;
+import retrofit2.http.GET;
+import retrofit2.http.Query;
 import rx.Observable;
 
 public interface WeatherHacksApi {
