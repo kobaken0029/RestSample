@@ -14,9 +14,9 @@ import java.util.Date;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import retrofit.RestAdapter;
-import retrofit.android.AndroidLog;
-import retrofit.converter.GsonConverter;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -34,20 +34,20 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         Gson gson = new GsonBuilder()
-                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES)
+                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .registerTypeAdapter(Date.class, new DateTypeAdapter())
                 .create();
 
-        RestAdapter adapter = new RestAdapter.Builder()
-                .setEndpoint("http://weather.livedoor.com")
-                .setConverter(new GsonConverter(gson))
-                .setLogLevel(RestAdapter.LogLevel.FULL)
-                .setLog(new AndroidLog("===NetWork==="))
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://weather.livedoor.com")
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
 
-        adapter.create(WeatherHacksApi.class).get("070030")
-                .subscribeOn(Schedulers.newThread())
+        retrofit.create(WeatherHacksApi.class)
+                .get("070030")
                 .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<ResponseObject>() {
                     @Override
                     public void onCompleted() {
@@ -70,6 +70,5 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
-
     }
 }
