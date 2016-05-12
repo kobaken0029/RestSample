@@ -17,7 +17,6 @@ import butterknife.ButterKnife;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
-import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -48,27 +47,16 @@ public class MainActivity extends AppCompatActivity {
                 .get("070030")
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe(new Observer<ResponseObject>() {
-                    @Override
-                    public void onCompleted() {
-                        // 処理完了時コールバック
-                        Log.d(TAG, "onCompleted()");
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        // 通信エラー時コールバック
-                        Log.d(TAG, "onError() Error: " + e.toString());
-                    }
-
-                    @Override
-                    public void onNext(ResponseObject response) {
-                        // 処理結果が引き数に入ってくる
-                        Log.d(TAG, "onNext()");
-                        if (response != null) {
-                            mResultTextView.setText(response.getForecasts().get(0).getTelop());
-                        }
-                    }
-                });
+                .subscribe(
+                        response -> {
+                            // 処理結果が引き数に入ってくる
+                            Log.d(TAG, "onNext()");
+                            if (response != null) {
+                                mResultTextView.setText(response.getForecasts().get(0).getTelop());
+                            }
+                        },
+                        throwable -> Log.d(TAG, "onError() Error: " + throwable.toString()),
+                        () -> Log.d(TAG, "onCompleted()")
+                );
     }
 }
